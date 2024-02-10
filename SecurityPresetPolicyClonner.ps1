@@ -67,7 +67,7 @@ $title = @'
 #>
 
 
-
+#Write function formatter
 function DisplayHelp([string]$text, [string]$color) {
     if ($color) {
         Write-Host $text -ForegroundColor $color
@@ -96,7 +96,6 @@ function Convert-ArrayToHashtable ([array]$ArrayStringData) {
 
 
 
-
 # Check if exhange online modue is installed
 # if not instsalled, proceed to install with scope user permission else proceed to connect
 # Connect to exchange online
@@ -109,6 +108,8 @@ if("ExchangeOnlineManagement" -notin (Get-InstalledModule).Name){
 
     DisplayHelp "ExchangeOnlineManagement module installation complted....... Connecting"
 
+    Connect-ExchangeOnline -ShowBanner:$false
+
 }else {
 
     DisplayHelp "Conneting...... Sign-in with global or exchange admin account " 
@@ -118,165 +119,85 @@ if("ExchangeOnlineManagement" -notin (Get-InstalledModule).Name){
 
 }
 
-function Get-PredefinedData ([string]$PolicyType) {
+# This function get the predefind configuration of the of strict and standard policy settings
+# This will also be used of effectively change validate selection
+function Get-StandardPredefinedPolicy {
 
-    $preVer = "StandardPredefined","StrictPredefined"
+    $pp_ati_spm = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiSpam.ps1
+    $pp_ati_mw  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiMalware.ps1
+    $pp_ati_ph  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiPhish.ps1
+    $pp_ati_sat  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_safeAttachment.ps1
+    $pp_ati_slk  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_safeLinks.ps1
 
-    switch ($PolicyType) {
+    return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
+}
+
+# get strict predefined data set
+function Get-StrictPredefinedPolicy {
+
+    $pp_ati_spm = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiSpam.ps1
+    $pp_ati_mw  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiMalware.ps1
+    $pp_ati_ph  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiPhish.ps1
+    $pp_ati_sat  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_safeAttachment.ps1
+    $pp_ati_slk  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_safeLinks.ps1
+
+    return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
+}
+
+# policy creation functions
+function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
+
+    Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
+    New-HostedConnectionFilterPolicy @PolicyCreationData
+}
+
+function New-MalwareSecurityPresetPolicy ([hashtable]$PolicyCreationData){
+
+    Write-Verbose -Message "Clonning Malwar Filter  $($PolicyCreationData.Name) and rule" -verbose
+    New-MalwareFilterPolicy @PolicyCreationData
+}
+
+function New-AntiPhishSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
     
-        "StandardPredefined" {
+    Write-Verbose -Message "Clonning Anti-Phish  $($PolicyCreationData.Name) and rule" -verbose
+    New-AntiPhishPolicy @PolicyCreationData
+    
+}
 
-            Write-Host "checking now"
+function New-SafeAttachmentSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 
-            $pp_ati_spm = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiSpam.ps1
-            $pp_ati_mw  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiMalware.ps1
-            $pp_ati_ph  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiPhish.ps1
+    Write-Verbose -Message "Clonning Safe Attachment  $($PolicyCreationData.Name) and rule" -verbose
+    New-SafeAttachmentPolicy @PolicyCreationData
 
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
-            break
-        }
+}
 
-        "StrictPredefined" {
-            Write-Host "ot checinggsdkasbkjhs"
-            $pp_ati_spm = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiSpam.ps1
-            $pp_ati_mw  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiMalware.ps1
-            $pp_ati_ph  = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\str_antiPhish.ps1
+function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
+    Write-Verbose -Message "Clonning Safe Link  $($PolicyCreationData.Name) and rule" -verbose
+    New-SafeLinksPolicy @PolicyCreationData
 
-            break
-        }
-
-        Default { "Invalid selection"}
-
-    }
 }
 
 
 
 
-# main function
-function securityPresetPolicy {
-    [CmdletBinding()]
+
+
+# This will be use to create policy
+function New-SecurityPresetPolicy {
+    
+    [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory)]
-        [ValidateSet("Standard","Strict","StandardPredefined","StrictPredefined")]
-        $PresetPolicyType
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("StandardPolicy","StrictPolicy","StandardPredefinedPolicy","StrictPredefinedPolicy","AllStrictPolicy","AllStandardPolicy","AllStrictPredefinedPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy")]
+        $PresetPolicyCreationType
     )
 
 
-    # Policy selection
-    # The policy retrival will depend on the select option by user
-    # if user selects Predefined or defult, you must use either strict or standard,StrictPredefined and StandardPredefined
-    
-    switch ($PresetPolicyType) {
-
-        
-        "Standard" { 
-            
-            # locad the predefind data set
-            $PredefinedPresetPolicySettings = Get-PredefinedData -PolicyType StandardPredefined
-
-
-            $pp_ati_spm = Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-            $pp_ati_mw = Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-            $pp_ati_ph = Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-
-            #checking and setting the values to the predefine value of the virables are null
-            if ($null -eq $pp_ati_spm) {
-                $pp_ati_spm = $PredefinedPresetPolicySettings[0]
-            }
-
-            if ($null -eq $pp_ati_mw) {
-                $pp_ati_mw  = $PredefinedPresetPolicySettings[1]
-            }
-
-            if ($null -eq $pp_ati_ph) {
-                $pp_ati_ph  = $PredefinedPresetPolicySettings[2]
-            }
-
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
-            
-            break 
-        }
-
-        "Strict" { 
-            
-            # locad the predefind data set
-            $PredefinedPresetPolicySettings = Get-PredefinedData -PolicyType StrictPredefined
-
-            $pp_ati_spm = Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-            $pp_ati_mw = Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-            $pp_ati_ph = Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
-
-            #checking and setting the values to the predefine value of the virables are null
-            if ($null -eq $pp_ati_spm) {
-                $pp_ati_spm = $PredefinedPresetPolicySettings[0]
-            }
-
-            if ($null -eq $pp_ati_mw) {
-                $pp_ati_mw  = $PredefinedPresetPolicySettings[1]
-            }
-
-            if ($null -eq $pp_ati_ph) {
-                $pp_ati_ph  = $PredefinedPresetPolicySettings[2]
-            }
-
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
-            
-            break 
-        }
-
-        "StandardPredefined" {
-            $pp_ati_spm, $pp_ati_mw, $pp_ati_ph = Get-PredefinedData -PolicyType StandardPredefined
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
-            break
-        }
-
-        "StrictPredefined" {
-            $pp_ati_spm, $pp_ati_mw, $pp_ati_ph = Get-PredefinedData -PolicyType StrictPredefined
-            return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph
-            break
-        }
-
-        Default { " No Vaild option has been selected for policy creation!!"; break}
-    }
-    
-    
-    # Check if the $pp_ati_mw, $pp_ati_ph and $pp_ati_spm are NULL
-    # If standard or strict is select, theh variables could be null if the policy was never enabled on the tenant.
-    # if this happens then 
-
-
-    # create new polices either using current available strict/standard policies or you use the default values that are part of the script
-
-
-
-    
-    switch ($PresetPolicyType) {
-
-        $user = "YSGGDD"
-        condition { ; break }
-        Default {}
-    }
-
-    
-
-
-    #using default vaues
-
-
-
 
 
 
 }
-
-
-$pp_ati_spm = Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
-$pp_ati_mw = Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
-$pp_ati_ph = Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
-
 
 
 
@@ -284,4 +205,13 @@ New-AntiPhishPolicy -
 
 Write-Output -InputObject ("`r`n"*3),"Standard anti-malware policy",("-"*79);Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
 Write-Output -InputObject ("`r`n"*3),"Standard anti-spam policy",("-"*79);Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
-Write-Output -InputObject ("`r`n"*3),"Standard anti-phishing policy",("-"*79);Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
+Write-Output -InputObject ("`r`n"*3),"Standard anti-phishing policy",("-"*79);Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
+Write-Output -InputObject ("`r`n"*3),"Standard Safe Attachments policy",("-"*79);Get-SafeAttachmentPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
+Write-Output -InputObject ("`r`n"*3),"Standard Safe Links policy",("-"*79);Get-SafeLinksPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
+
+
+Write-Output -InputObject ("`r`n"*3),"Strict anti-malware policy",("-"*79);Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
+Write-Output -InputObject ("`r`n"*3),"Strict anti-spam policy",("-"*79);Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
+Write-Output -InputObject ("`r`n"*3),"Strict anti-phishing policy",("-"*79);Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict";
+Write-Output -InputObject ("`r`n"*3),"Strict Safe Attachments policy",("-"*79);Get-SafeAttachmentPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
+Write-Output -InputObject ("`r`n"*3),"Strict Safe Links policy",("-"*79);Get-SafeLinksPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"
