@@ -25,15 +25,16 @@ param(
 )
 
 
+#text for lenght
+$textLenght = 135
 $title = @'
 
-
     
-    ################################################################################################################### 
+#######################################################################################################################################
             
                         Preset security policies in EOP and Microsoft Defender for Office 365
 
-    ###################################################################################################################
+#######################################################################################################################################
 
     This script attempts to create a compy of the Microsoft 365 Defender preset policies
 
@@ -58,31 +59,37 @@ $title = @'
         *   If the present not yet enabled on the tenant, the custom preset policeis will be created setting at the creation of ths script
         *   There are some configurable and non configurable paramters below is the list some of the relevant or notables
         *   Unchangeable Paramters: 
-                EnableSuspiciousSafetyTip:feature cannot be MODIFIED an this is by design, this means that the "Strict Preset Policy" value
-                for EnableSuspiciousSafetyTip is True but cannot be transferred to the "Custom Strict Preset Policy" because it cannot be changed
-                For more information: https://learn.microsoft.com/en-us/powershell/module/exchange/get-antiphishpolicy?view=exchange-ps#-advanced
+                EnableSuspiciousSafetyTip:feature cannot be MODIFIED an this is by design, this means that the "Strict Preset 
+                Policy" value for EnableSuspiciousSafetyTip is True but cannot be transferred to the "Custom Strict Preset Policy" 
+                because it cannot be changed For more information: 
+                    https://learn.microsoft.com/en-us/powershell/module/exchange/get-antiphishpolicy?view=exchange-ps#-advanced
 
                 ZapEnabled: This paramter by default is set to TRUE for both standard and strict but this is not configurable for 
                 the HostedContentFilterPolicy(Anti-spam inbound policy) becuause is basicallt inherided from MalwareFilterPolicy. 
 
         *   Configuratable Paramters
                 Malware Policy
-                InternalSenderAdminAddress / ExternalSenderAdminAddress / EnableExternalSenderAdminNotifications
-                This paramter can be configured but is not configure on the both strict and standard policy. If you want use use it, the you can
-                configure it later by using the portal or Set-MalwareFilterPolicy <Policy Name>. For more information you can refer to the link
-                to know about the applicable situation: https://learn.microsoft.com/en-us/powershell/module/exchange/new-malwarefilterpolicy?view=exchange-ps
-                
-
-
+                InternalSenderAdminAddress / ExternalSenderAdminAddress / EnableExternalSenderAdminNotifications: This paramter
+                can be configured but is not configure on the both strict and standard policy. If you want use use it, the you 
+                can configure it later by using the portal or Set-MalwareFilterPolicy <Policy Name>. For more information you
+                can refer to the link to know about the applicable situation:
+                    https://learn.microsoft.com/en-us/powershell/module/exchange/new-malwarefilterpolicy?view=exchange-ps
                 
         
 
-    ###################################################################################################################
+######################################################################################################################################
 '@
 
 
 
-
+# Text header formatting function
+function DisplayHeader([string]$text){
+    $textPadding = [int]($textLenght - $text.Length)/2
+    Write-Host "`n"
+    Write-Host $("#" * $textLenght) "`n"
+    Write-Host $(" " * $textPadding ) $text "`n"
+    Write-Host $("#" * $textLenght) "`n"
+}
 
 #Write function formatter
 function DisplayHelp([string]$text, [string]$color) {
@@ -161,11 +168,9 @@ function Get-StrictPredefinedPolicy {
     return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
 }
 
-################################################################################
+#policy creation header
+DisplayHeader -text "Policy creation functions"
 
-                        #policy creation functions
-
-################################################################################
 function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
 
     Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
@@ -200,11 +205,8 @@ function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 }
 
 
-###################################################################################
 
-                        #Policy creation
 
-###################################################################################
 
 switch (expression) {
     condition { ; break }
