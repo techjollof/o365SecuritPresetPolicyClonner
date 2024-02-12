@@ -49,3 +49,24 @@ function Get-DefaultPresetPolicy {
     return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
 
 }
+
+
+[CmdletBinding(SupportsShouldProcess)]
+
+param(
+    # Policy type selection
+    [Parameter()]
+    [ValidateSet("Standard","Strict")]
+    $PresetPolicyType,
+
+    # this provides the type of policies that can be create depending on what is selected
+    [Parameter()]
+    [ValidateSet(
+        if($PresetPolicyType -eq "Standard"){
+            "StandardPolicy","StandardPredefinedPolicy","AllStandardPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy"
+        }else{
+            "StrictPolicy","SrictPredefinedPolicy","AllStrictPolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy"
+        }
+    )]
+    $PresetPolicyCreationType
+)

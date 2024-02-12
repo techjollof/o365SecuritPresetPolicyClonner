@@ -1,4 +1,30 @@
 
+<#
+.SYNOPSIS
+    Short description
+.DESCRIPTION
+    Long description
+.EXAMPLE
+    Example of how to use this cmdlet
+.EXAMPLE
+    Another example of how to use this cmdlet
+#>
+
+[CmdletBinding(SupportsShouldProcess)]
+
+param(
+    # Policy type selection
+    [Parameter()]
+    [ValidateSet("Standard","Strict")]
+    $PresetPolicyType,
+
+    # this provides the type of policies that can be create depending on what is selected
+    [Parameter()]
+    [ValidateSet("AllStrictPolicy","AllStandardPolicy","StandardPredefinedPolicy","StrictPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy")]
+    $PresetPolicyCreationType
+)
+
+
 $title = @'
 
 
@@ -55,16 +81,7 @@ $title = @'
 '@
 
 
-<#
-.SYNOPSIS
-    Short description
-.DESCRIPTION
-    Long description
-.EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-#>
+
 
 
 #Write function formatter
@@ -144,7 +161,11 @@ function Get-StrictPredefinedPolicy {
     return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
 }
 
-# policy creation functions
+################################################################################
+
+                        #policy creation functions
+
+################################################################################
 function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
 
     Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
@@ -179,39 +200,14 @@ function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 }
 
 
+###################################################################################
 
+                        #Policy creation
 
+###################################################################################
 
-
-# This will be use to create policy
-function New-SecurityPresetPolicy {
-    
-    [CmdletBinding(SupportsShouldProcess)]
-    param(
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("StandardPolicy","StrictPolicy","StandardPredefinedPolicy","StrictPredefinedPolicy","AllStrictPolicy","AllStandardPolicy","AllStrictPredefinedPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy")]
-        $PresetPolicyCreationType
-    )
-
-
-
-
-
+switch (expression) {
+    condition { ; break }
+    Default {}
 }
 
-
-
-New-AntiPhishPolicy -
-
-Write-Output -InputObject ("`r`n"*3),"Standard anti-malware policy",("-"*79);Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
-Write-Output -InputObject ("`r`n"*3),"Standard anti-spam policy",("-"*79);Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
-Write-Output -InputObject ("`r`n"*3),"Standard anti-phishing policy",("-"*79);Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
-Write-Output -InputObject ("`r`n"*3),"Standard Safe Attachments policy",("-"*79);Get-SafeAttachmentPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"; 
-Write-Output -InputObject ("`r`n"*3),"Standard Safe Links policy",("-"*79);Get-SafeLinksPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Standard"
-
-
-Write-Output -InputObject ("`r`n"*3),"Strict anti-malware policy",("-"*79);Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
-Write-Output -InputObject ("`r`n"*3),"Strict anti-spam policy",("-"*79);Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
-Write-Output -InputObject ("`r`n"*3),"Strict anti-phishing policy",("-"*79);Get-AntiPhishPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict";
-Write-Output -InputObject ("`r`n"*3),"Strict Safe Attachments policy",("-"*79);Get-SafeAttachmentPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"; 
-Write-Output -InputObject ("`r`n"*3),"Strict Safe Links policy",("-"*79);Get-SafeLinksPolicy | Where-Object -Property RecommendedPolicyType -eq -Value "Strict"
