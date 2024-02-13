@@ -1,30 +1,3 @@
-
-<#
-.SYNOPSIS
-    Short description
-.DESCRIPTION
-    Long description
-.EXAMPLE
-    Example of how to use this cmdlet
-.EXAMPLE
-    Another example of how to use this cmdlet
-#>
-
-[CmdletBinding(SupportsShouldProcess)]
-
-param(
-    # Policy type selection
-    [Parameter()]
-    [ValidateSet("Standard","Strict")]
-    $PresetPolicyType,
-
-    # this provides the type of policies that can be create depending on what is selected
-    [Parameter()]
-    [ValidateSet("AllStrictPolicy","AllStandardPolicy","StandardPredefinedPolicy","StrictPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy")]
-    $PresetPolicyCreationType
-)
-
-
 #text for lenght
 $textLenght = 135
 $title = @'
@@ -171,6 +144,7 @@ function Get-StrictPredefinedPolicy {
 #policy creation header
 DisplayHeader -text "Policy creation functions"
 
+#antispam funtion
 function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
 
     Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
@@ -204,12 +178,124 @@ function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 
 }
 
-
-
-
-
-switch (expression) {
-    condition { ; break }
-    Default {}
+function New-AllSecurityPresetPolicy([hashtable]$AntiSpam, [hashtable]$AntiMalware, [hashtable]$AntiPhish, [hashtable]$SafeAttachment, [hashtable]$SafeLink) {
+    if ($AntiSpam) {
+        New-AntiSpamSecurityPresetPolicy @AntiSpam
+    }
+    if ($AntiMalware) {
+        New-MalwareSecurityPresetPolicy @AntiMalware
+    }
+    if ($AntiPhish) {
+        New-AntiPhishSecurityPresetPolicy @AntiPhish
+    }
+    if ($SafeAttachment) {
+        New-SafeAttachmentSecurityPresetPolicy @SafeAttachment
+    }
+    if ($SafeLink) {
+        New-SafeLinkSecurityPresetPolicy @SafeLink
+    }
 }
+
+
+function New-SecurityPresetPolicy {
+    <#
+    .SYNOPSIS
+        Short description
+    .DESCRIPTION
+        Long description
+    .EXAMPLE
+        Example of how to use this cmdlet
+    .EXAMPLE
+        Another example of how to use this cmdlet
+    #>
+
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        # Policy type selection
+        [Parameter(Mandatory,HelpMessage="StandardPolicy: This will generate standard security preset policies `nStrictPolicy: This will generate strict security preset policies `nStandardStrictPolicy: This will generate both standard and strict preset policies")]
+        [ValidateSet("StandardPolicy","StrictPolicy","StandardStrictPolicy")]
+        $SecurityPresetPolicy,
+
+        # # this provides the type of policies that can be create depending on what is selected
+        [Parameter(HelpMessage="Selection the option needed for policy creation, that antispam, malware, antiphish, safe links and safe attachment, you can select to create all policies or specific")]
+        [ValidateSet("AntiSpamPolicy","AntiPhishPolicy","MalwarePolicy","SafeAttachmentPolicy","SafeLinkPolicy","AllPresetPolicy")]
+        $PresetPolicyType
+
+    )
+
+    if ($PSBoundParameters["SecurityPresetPolicy"] -in "StandardPolicy","StrictPolicy") {
+
+        #Preset policy data set
+        $pp_ati_spm, $pp_ati_mw, $pp_ati_ph, $pp_ati_sat, $pp_ati_slk = if($SecurityPresetPolicy -eq "StandardPolicy"){Get-StandardPredefinedPolicy}{Get-StrictPredefinedPolicy}
+        
+        switch ($PresetPolicyType) {
+            "AllPresetPolicy" { 
+                New-AllSecurityPresetPolicy -AntiSpam $pp_ati_spm -AntiMalware $pp_ati_mw -AntiPhish $pp_ati_ph -SafeAttachment $pp_ati_sat -SafeLink $pp_ati_slk
+                break 
+            }
+            "AntiSpamPolicy" { 
+                New-AntiSpamSecurityPresetPolicy @pp_ati_spm                
+                break 
+            }
+            "MalwarePolicy" { 
+                New-MalwareSecurityPresetPolicy @pp_ati_mw                
+                break 
+            }
+            "AntiPhishPolicy" { 
+                New-AntiPhishSecurityPresetPolicy @pp_ati_ph                
+                break 
+            }
+            "SafeAttachmentPolicy" { 
+                New-SafeLinkSecurityPresetPolicy @pp_ati_slk
+                break 
+            }
+            "SafeLinkPolicy" { 
+                New-SafeLinkSecurityPresetPolicy @pp_ati_slk
+                break 
+            }
+        }
+    }else {
+        # This section will create both standard and strict preset policy depending on the feature selected
+        $std_pp_ati_spm, $std_pp_ati_mw, $std_pp_ati_ph, $std_pp_ati_sat, $std_pp_ati_slk = Get-StandardPredefinedPolicy
+        $str_pp_ati_spm, $str_pp_ati_mw, $str_pp_ati_ph, $str_pp_ati_sat, $str_pp_ati_slk = Get-StrictPredefinedPolicy
+
+        switch ($PresetPolicyType) {
+            "AllPresetPolicy" { 
+                New-AllSecurityPresetPolicy -AntiSpam $std_pp_ati_spm -AntiMalware $std_pp_ati_mw -AntiPhish $std_pp_ati_ph -SafeAttachment $std_pp_ati_sat -SafeLink $std_pp_ati_slk
+                New-AllSecurityPresetPolicy -AntiSpam $str_pp_ati_spm -AntiMalware $str_pp_ati_mw -AntiPhish $str_pp_ati_ph -SafeAttachment $str_pp_ati_sat -SafeLink $str_pp_ati_slk
+                break 
+            }
+            "AntiSpamPolicy" { 
+                New-AntiSpamSecurityPresetPolicy @std_pp_ati_spm
+                New-AntiSpamSecurityPresetPolicy @str_pp_ati_spm              
+                break 
+            }
+            "MalwarePolicy" { 
+                New-MalwareSecurityPresetPolicy @std_pp_ati_mw
+                New-MalwareSecurityPresetPolicy @str_pp_ati_mw                
+                break 
+            }
+            "AntiPhishPolicy" { 
+                New-AntiPhishSecurityPresetPolicy @std_pp_ati_ph
+                New-AntiPhishSecurityPresetPolicy @str_pp_ati_ph                
+                break 
+            }
+            "SafeAttachmentPolicy" { 
+                New-SafeLinkSecurityPresetPolicy @std_pp_ati_slk
+                New-SafeLinkSecurityPresetPolicy @str_pp_ati_slk
+                break 
+            }
+            "SafeLinkPolicy" { 
+                New-SafeLinkSecurityPresetPolicy @std_pp_ati_slk
+                New-SafeLinkSecurityPresetPolicy @str_pp_ati_slk
+                break 
+            }
+        }
+
+    }
+    
+}
+
+
+
 
