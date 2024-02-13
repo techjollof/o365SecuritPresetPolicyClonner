@@ -9,7 +9,7 @@ $title = @'
 
 #######################################################################################################################################
 
-    This script attempts to create a compy of the Microsoft 365 Defender preset policies
+    This script attempts to create a copy of the Microsoft 365 Defender preset policies
 
     Depending on your organization, preset security policies provide many of the protection features that are available 
     in Exchange Online Protection (EOP) and Microsoft Defender for Office 365.
@@ -21,10 +21,10 @@ $title = @'
 
     The script give generate copy of all policies that are releate to Standard and Strict present policies
 
-    The policy on clonse the existing policy and does not take care of any future change make back Microsoft backend team.
+    The policy on clone the existing policy and does not take care of any future change make back Microsoft backend team.
     Admins are responsible to manually update the changes that microsoft makes to preset on the clonned security preset policies
 
-    This is basically, custom policy but completely using the existing present policies
+    This is basically a custom policy but completely using the existing preset policies at the time of script creation
 
     The scritpt can address few things
 
@@ -144,73 +144,112 @@ function Get-StrictPredefinedPolicy {
 #policy creation header
 DisplayHeader -text "Policy creation functions"
 
-#antispam funtion
-function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
+#Anti spam, malware, phish, safe attachment, safe link funtion
+function New-AllSecurityPresetPolicy{
+    [CmdletBinding()]
+    param (
+        [hashtable]$AntiSpam, 
+        [hashtable]$AntiMalware,
+        [hashtable]$AntiPhish, 
+        [hashtable]$SafeAttachment, 
+        [hashtable]$SafeLink,
+        [Parameter(Mandatory,HelpMessage="Specifies a test mailbox or shared that will be used to create policy rule")]
+        [string]
+        $TestSharedOrUserMailbox
+    )
+    # get the name of the policies for rule creation
+    $PolicyNames = @{}
 
-    Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
-    New-HostedConnectionFilterPolicy @PolicyCreationData
-}
-
-function New-MalwareSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Malwar Filter  $($PolicyCreationData.Name) and rule" -verbose
-    New-MalwareFilterPolicy @PolicyCreationData
-}
-
-function New-AntiPhishSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
-    
-    Write-Verbose -Message "Clonning Anti-Phish  $($PolicyCreationData.Name) and rule" -verbose
-    New-AntiPhishPolicy @PolicyCreationData
-    
-}
-
-function New-SafeAttachmentSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Safe Attachment  $($PolicyCreationData.Name) and rule" -verbose
-    New-SafeAttachmentPolicy @PolicyCreationData
-
-}
-
-function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Safe Link  $($PolicyCreationData.Name) and rule" -verbose
-    New-SafeLinksPolicy @PolicyCreationData
-
-}
-
-function New-AllSecurityPresetPolicy([hashtable]$AntiSpam, [hashtable]$AntiMalware, [hashtable]$AntiPhish, [hashtable]$SafeAttachment, [hashtable]$SafeLink) {
     if ($AntiSpam) {
-        New-AntiSpamSecurityPresetPolicy @AntiSpam
+        Write-Verbose -Message "Clonning Anti-Spam  $($AntiSpam.Name) and rule" -verbose
+        $policyInfo = New-HostedContentFilterPolicy @AntiSpam
+        
+
+        $PolicyNames.Add("AntiSpam", $AntiSpam.Name)
     }
     if ($AntiMalware) {
-        New-MalwareSecurityPresetPolicy @AntiMalware
+        Write-Verbose -Message "Clonning Malwar Filter  $($AntiMalware.Name) and rule" -verbose
+        $policyInfo = New-MalwareFilterPolicy @AntiMalware
+        if ($null -ne $policyInfo) {
+            $PolicyNames.Add("AntiMalware", $policyInfo.Name)
+            New-MalwareFilterRule -Name $policyInfo.Name -MalwareFilterPolicy $policyInfo.Name -SentTo $TestSharedOrUserMailbox
+        } 
     }
     if ($AntiPhish) {
-        New-AntiPhishSecurityPresetPolicy @AntiPhish
+        Write-Verbose -Message "Clonning Anti-Phish  $($AntiPhish.Name) and rule" -verbose
+        $policyInfo = New-AntiPhishPolicy @AntiPhish 
+        if ($null -ne $policyInfo) {
+            New-AntiPhishRule -Name $policyInfo.Name -AntiPhishPolicy $policyInfo.Name  -SentTo $TestSharedOrUserMailbox
+            $PolicyNames.Add("AntiPhish", $policyInfo.Name)
+        }
     }
     if ($SafeAttachment) {
-        New-SafeAttachmentSecurityPresetPolicy @SafeAttachment
+        Write-Verbose -Message "Clonning Safe Attachment  $($SafeAttachment.Name) and rule" -verbose
+        $policyInfo = New-SafeAttachmentPolicy @SafeAttachment
+        if ($null -ne $policyInfo) {
+            New-SafeAttachmentRule -Name $policyInfo.Name -SafeAttachmentPolicy $policyInfo.Name -SentTo $TestSharedOrUserMailbox
+            $PolicyNames.Add("SafeAttachment", $policyInfo.Name)
+        }
     }
     if ($SafeLink) {
-        New-SafeLinkSecurityPresetPolicy @SafeLink
+        Write-Verbose -Message "Clonning Safe Link  $($SafeLink.Name) and rule" -verbose
+        New-SafeLinksPolicy @SafeLink
+        if ($null -ne $policyInfo){
+            New-SafeLinksRule -Name  $policyInfo.Name -SafeLinksPolicy  $policyInfo.Name -SentTo $TestSharedOrUserMailbox
+            $PolicyNames.Add("SafeLink", $policyInfo.Name)
+        }
     }
+
+    if ($PolicyNames.Count -ne 0) {
+        return $PolicyNames
+    }
+
+
+}
+
+function New-EOPATPProtectionRule ([string]$PresentRuleName, [str]$AntiPhishPolicy,[string]$HostedContentFilterPolicy,[string]$MalwareFilterPolicy, [string]$SafeAttachmentPolicy,$SafeLinksRule){
+    
+    New-EOPProtectionPolicyRule -Name $PresentRuleName -AntiPhishPolicy $AntiPhishPolicy -HostedContentFilterPolicy $HostedContentFilterPolicy -MalwareFilterPolicy $MalwareFilterPolicy
+    New-ATPProtectionPolicyRule -Name $PresentRuleName -SafeAttachmentPolicy $SafeAttachmentPolicy -SafeLinksRule $SafeLinksRule
 }
 
 
 function New-SecurityPresetPolicy {
     <#
     .SYNOPSIS
-        Short description
+        This script attempts to create a copy of the Microsoft 365 Defender preset policies.
     .DESCRIPTION
-        Long description
+        Depending on your organization, preset security policies provide many of the protection features that are available 
+        in Exchange Online Protection (EOP) and Microsoft Defender for Office 365.
+        The script give generate copy of all policies that are releate to Standard and Strict present policies
+
+        The policy on clone the existing policy and does not take care of any future change make back Microsoft backend team.
+        Admins are responsible to manually update the changes that microsoft makes to preset on the clonned security preset policies
+
+    .PARAMETER TestSharedOrUserMailbox
+        Specifies a test mailbox or shared that will be used to create policy rule. if the provided object is not a mailbox or shared mailbox,
+        A new shared mailbox be automaticall created and used for the policy rule creation.
+    .PARAMETER SecurityPresetPolicy
+        Specifies the type of the security present policy to create, the valid values "StandardPolicy","StrictPolicy","StandardStrictPolicy"
+    .PARAMETER PresetPolicyType
+        Specifies the object to be processed.  You can also pipe the objects to this command.
     .EXAMPLE
+        PS>
         Example of how to use this cmdlet
     .EXAMPLE
+        PS>
         Another example of how to use this cmdlet
+    
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
     param(
+
+        # TestSharedOrUserMailbox
+        [Parameter(Mandatory,HelpMessage="Specifies a test mailbox or shared that will be used to create policy rule")]
+        [string]
+        $TestSharedOrUserMailbox,
+
         # Policy type selection
         [Parameter(Mandatory,HelpMessage="StandardPolicy: This will generate standard security preset policies `nStrictPolicy: This will generate strict security preset policies `nStandardStrictPolicy: This will generate both standard and strict preset policies")]
         [ValidateSet("StandardPolicy","StrictPolicy","StandardStrictPolicy")]
@@ -219,9 +258,20 @@ function New-SecurityPresetPolicy {
         # # this provides the type of policies that can be create depending on what is selected
         [Parameter(HelpMessage="Selection the option needed for policy creation, that antispam, malware, antiphish, safe links and safe attachment, you can select to create all policies or specific")]
         [ValidateSet("AntiSpamPolicy","AntiPhishPolicy","MalwarePolicy","SafeAttachmentPolicy","SafeLinkPolicy","AllPresetPolicy")]
-        $PresetPolicyType
+        $PresetPolicyType,
+
+        [Parameter(HelpMessage="Specifies if you want EOP or ATP rule")]
+        [ValidateSet("EOPRule","ATPRule","BothEOPATRule")]
+        $CreateEOPATPRule
+        
 
     )
+
+    #validate TestSharedOrUserMailbox
+    if ((Get-Recipent $TestSharedOrUserMailbox).RecipientTypeDetails -notin "SharedMailbox","UserMailbbox") {
+        DisplayHelp -text "The $($TestSharedOrUserMailbox) is not a user or shared mailbox....... Proceeting to create a new shared for test purposes"
+        $TestSharedOrUserMailbox = (New-Mailbox  $("TestSharedOrUserMailbox"+(Get-Date).TimeOfDay.Ticks) -Shared).PrimarySMTPAddress
+    }
 
     if ($PSBoundParameters["SecurityPresetPolicy"] -in "StandardPolicy","StrictPolicy") {
 
@@ -230,27 +280,27 @@ function New-SecurityPresetPolicy {
         
         switch ($PresetPolicyType) {
             "AllPresetPolicy" { 
-                New-AllSecurityPresetPolicy -AntiSpam $pp_ati_spm -AntiMalware $pp_ati_mw -AntiPhish $pp_ati_ph -SafeAttachment $pp_ati_sat -SafeLink $pp_ati_slk
+                New-AllSecurityPresetPolicy -AntiSpam $pp_ati_spm -AntiMalware $pp_ati_mw -AntiPhish $pp_ati_ph -SafeAttachment $pp_ati_sat -SafeLink $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
             "AntiSpamPolicy" { 
-                New-AntiSpamSecurityPresetPolicy @pp_ati_spm                
+                New-AllSecurityPresetPolicy -AntiSpam $pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
             "MalwarePolicy" { 
-                New-MalwareSecurityPresetPolicy @pp_ati_mw                
+                New-AllSecurityPresetPolicy -AntiMalware $pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox           
                 break 
             }
             "AntiPhishPolicy" { 
-                New-AntiPhishSecurityPresetPolicy @pp_ati_ph                
+                New-AllSecurityPresetPolicy -AntiPhish $pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox              
                 break 
             }
             "SafeAttachmentPolicy" { 
-                New-SafeLinkSecurityPresetPolicy @pp_ati_slk
+                New-AllSecurityPresetPolicy -SafeAttachment $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
             "SafeLinkPolicy" { 
-                New-SafeLinkSecurityPresetPolicy @pp_ati_slk
+                New-AllSecurityPresetPolicy -SafeLink $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
         }
@@ -261,33 +311,33 @@ function New-SecurityPresetPolicy {
 
         switch ($PresetPolicyType) {
             "AllPresetPolicy" { 
-                New-AllSecurityPresetPolicy -AntiSpam $std_pp_ati_spm -AntiMalware $std_pp_ati_mw -AntiPhish $std_pp_ati_ph -SafeAttachment $std_pp_ati_sat -SafeLink $std_pp_ati_slk
-                New-AllSecurityPresetPolicy -AntiSpam $str_pp_ati_spm -AntiMalware $str_pp_ati_mw -AntiPhish $str_pp_ati_ph -SafeAttachment $str_pp_ati_sat -SafeLink $str_pp_ati_slk
+                New-AllSecurityPresetPolicy -AntiSpam $std_pp_ati_spm -AntiMalware $std_pp_ati_mw -AntiPhish $std_pp_ati_ph -SafeAttachment $std_pp_ati_sat -SafeLink $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -AntiSpam $str_pp_ati_spm -AntiMalware $str_pp_ati_mw -AntiPhish $str_pp_ati_ph -SafeAttachment $str_pp_ati_sat -SafeLink $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
             "AntiSpamPolicy" { 
-                New-AntiSpamSecurityPresetPolicy @std_pp_ati_spm
-                New-AntiSpamSecurityPresetPolicy @str_pp_ati_spm              
+                New-AllSecurityPresetPolicy -AntiSpam $std_pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -AntiSpam $str_pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox          
                 break 
             }
             "MalwarePolicy" { 
-                New-MalwareSecurityPresetPolicy @std_pp_ati_mw
-                New-MalwareSecurityPresetPolicy @str_pp_ati_mw                
+                New-AllSecurityPresetPolicy -AntiMalware $std_pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -AntiMalware $str_pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox               
                 break 
             }
             "AntiPhishPolicy" { 
-                New-AntiPhishSecurityPresetPolicy @std_pp_ati_ph
-                New-AntiPhishSecurityPresetPolicy @str_pp_ati_ph                
+                New-AllSecurityPresetPolicy -AntiPhish $std_pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -AntiPhish $str_pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox             
                 break 
             }
             "SafeAttachmentPolicy" { 
-                New-SafeLinkSecurityPresetPolicy @std_pp_ati_slk
-                New-SafeLinkSecurityPresetPolicy @str_pp_ati_slk
+                New-AllSecurityPresetPolicy -SafeAttachment $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -SafeAttachment $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
             "SafeLinkPolicy" { 
-                New-SafeLinkSecurityPresetPolicy @std_pp_ati_slk
-                New-SafeLinkSecurityPresetPolicy @str_pp_ati_slk
+                New-AllSecurityPresetPolicy -SafeLink $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                New-AllSecurityPresetPolicy -SafeLink $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                 break 
             }
         }

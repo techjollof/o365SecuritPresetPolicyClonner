@@ -50,23 +50,35 @@ function Get-DefaultPresetPolicy {
 
 }
 
+function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
 
-[CmdletBinding(SupportsShouldProcess)]
+    Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
+    New-HostedConnectionFilterPolicy @PolicyCreationData
+}
 
-param(
-    # Policy type selection
-    [Parameter()]
-    [ValidateSet("Standard","Strict")]
-    $PresetPolicyType,
+function New-MalwareSecurityPresetPolicy ([hashtable]$PolicyCreationData){
 
-    # this provides the type of policies that can be create depending on what is selected
-    [Parameter()]
-    [ValidateSet(
-        if($PresetPolicyType -eq "Standard"){
-            "StandardPolicy","StandardPredefinedPolicy","AllStandardPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy"
-        }else{
-            "StrictPolicy","SrictPredefinedPolicy","AllStrictPolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy"
-        }
-    )]
-    $PresetPolicyCreationType
-)
+    Write-Verbose -Message "Clonning Malwar Filter  $($PolicyCreationData.Name) and rule" -verbose
+    New-MalwareFilterPolicy @PolicyCreationData
+}
+
+function New-AntiPhishSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
+    
+    Write-Verbose -Message "Clonning Anti-Phish  $($PolicyCreationData.Name) and rule" -verbose
+    New-AntiPhishPolicy @PolicyCreationData
+    
+}
+
+function New-SafeAttachmentSecurityPresetPolicy ([hashtable]$PolicyCreationData){
+
+    Write-Verbose -Message "Clonning Safe Attachment  $($PolicyCreationData.Name) and rule" -verbose
+    New-SafeAttachmentPolicy @PolicyCreationData
+
+}
+
+function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
+
+    Write-Verbose -Message "Clonning Safe Link  $($PolicyCreationData.Name) and rule" -verbose
+    New-SafeLinksPolicy @PolicyCreationData
+
+}
