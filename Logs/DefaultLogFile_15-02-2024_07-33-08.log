@@ -1,0 +1,148 @@
+15-02-2024 10:00:54 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:00:54 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:00:58 I - 
+Exchange online connected is already connected
+
+15-02-2024 10:00:58 S - Function import successful
+15-02-2024 10:01:11 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:01:11 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:01:11 S - Function import successful
+15-02-2024 10:01:33 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:01:33 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 10:01:33 S - Success
+15-02-2024 10:01:41 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:01:41 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:01:45 I - 
+Exchange online connected is already connected
+
+15-02-2024 10:01:45 S - Function import successful
+15-02-2024 10:08:06 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:08:06 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 10:08:06 S - Success
+15-02-2024 10:08:08 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:08:08 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:08:12 I - Exchange online connected is already connected
+
+15-02-2024 10:08:12 S - Function import successful
+15-02-2024 10:13:40 E - Error: The term 'Get-Recipent' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again. 
+15-02-2024 10:14:59 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:14:59 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 10:14:59 S - Success
+15-02-2024 10:15:02 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:15:02 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:15:06 I - Exchange online connected is already connected
+
+15-02-2024 10:15:06 S - Function import successful
+15-02-2024 10:16:25 E - Error: Ex6F9304|Microsoft.Exchange.Configuration.Tasks.ManagementObjectNotFoundException|The operation couldn't be performed because object 'GraceHasCom' couldn't be found on 'PH0PR22A09DC001.NAMPR22A009.PROD.OUTLOOK.COM'. 
+15-02-2024 10:16:25 I - -TextThe GraceHasCom is not a user or shared mailbox....... Proceeting to create a new shared for test purposes
+15-02-2024 10:16:34 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiSpam.ps1
+15-02-2024 10:16:34 S - Loaded successfully
+15-02-2024 10:16:34 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiMalware.ps1
+15-02-2024 10:16:34 S - Loaded successfully
+15-02-2024 10:16:34 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiPhish.ps1
+15-02-2024 10:16:34 S - Loaded successfully
+15-02-2024 10:16:34 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeAttachment.ps1
+15-02-2024 10:16:34 S - Loaded successfully
+15-02-2024 10:16:34 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeLinks1.ps1
+15-02-2024 10:16:34 E - Error: Exception calling "ReadAllText" with "1" argument(s): "Could not find file 'C:\Users\PNDT\Documents\GitHub\o365SecuritPresetPolicyClonner\DefaultValues\std_safeLinks1.ps1'." 
+15-02-2024 10:16:34 I - Clonning Anti-Spam  Custom Standard Security Preset Policy and rule
+15-02-2024 10:17:32 E - Error: Ex6F9304|Microsoft.Exchange.Configuration.Tasks.ManagementObjectNotFoundException|The operation couldn't be performed because object 'GraceHasCom' couldn't be found on 'PH0PR22A09DC001.NAMPR22A009.PROD.OUTLOOK.COM'. 
+15-02-2024 10:17:32 I - -TextThe GraceHasCom is not a user or shared mailbox....... Proceeting to create a new shared for test purposes
+15-02-2024 10:17:40 E - Error: Cannot validate argument on parameter 'PresetPolicyType'. The argument "StandardAndStrict" does not belong to the set "Standard,Strict" specified by the ValidateSet attribute. Supply an argument that is in the set and then try the command again. 
+15-02-2024 10:21:11 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:21:11 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 10:21:11 S - Success
+15-02-2024 10:21:13 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:21:13 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:21:17 I - Exchange online connected is already connected
+
+15-02-2024 10:21:17 S - Function import successful
+15-02-2024 10:21:27 E - Error: Ex6F9304|Microsoft.Exchange.Configuration.Tasks.ManagementObjectNotFoundException|The operation couldn't be performed because object 'GraceHasCom12' couldn't be found on 'PH0PR22A09DC001.NAMPR22A009.PROD.OUTLOOK.COM'. 
+15-02-2024 10:21:27 E - Error: Cannot validate argument on parameter 'PresetPolicyType'. The argument "StandardAndStrict" does not belong to the set "Standard,Strict" specified by the ValidateSet attribute. Supply an argument that is in the set and then try the command again. 
+15-02-2024 10:30:05 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:30:05 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 10:30:05 S - Success
+15-02-2024 10:30:08 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 10:30:08 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 10:30:13 I - Exchange online connected is already connected
+
+15-02-2024 10:30:13 S - Function import successful
+15-02-2024 10:30:25 I - -TextThe GraceHasCom12  account does not exist or not user/shared mailbox....... Proceeting to create a new shared mailbox for test purposes
+15-02-2024 10:30:31 E - Error: Cannot validate argument on parameter 'PresetPolicyType'. The argument "StandardAndStrict" does not belong to the set "Standard,Strict" specified by the ValidateSet attribute. Supply an argument that is in the set and then try the command again. 
+15-02-2024 11:09:21 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 11:09:21 I - The program has ended because usage terms were declined and no command was inported!!!
+15-02-2024 11:09:21 S - Success
+15-02-2024 11:09:27 I - User was presented with license agreement conditons [Yes(Y)/No(N)
+15-02-2024 11:09:27 I - The license agreement conditons was accepted, preceeding to import the needed functionss
+15-02-2024 11:09:31 I - Exchange online connected is already connected
+
+15-02-2024 11:09:31 S - Function import successful
+15-02-2024 11:09:36 I - The GraceHasCom12  account does not exist or not user/shared mailbox....... Proceeting to create a new shared mailbox for test purposes
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiSpam.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiMalware.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiPhish.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeAttachment.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeLinks1.ps1
+15-02-2024 11:09:43 E - Error: Exception calling "ReadAllText" with "1" argument(s): "Could not find file 'C:\Users\PNDT\Documents\GitHub\o365SecuritPresetPolicyClonner\DefaultValues\std_safeLinks1.ps1'." 
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiSpam.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiMalware.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiPhish.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeAttachment.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeLinks.ps1
+15-02-2024 11:09:43 S - Loaded successfully
+15-02-2024 11:09:43 I - Clonning Anti-Phish  Custom Standard Preset Security Policy and rule
+15-02-2024 11:09:46 E - Error: |Microsoft.Exchange.Management.Tasks.ValidationException|Policy "Custom Standard Preset Security Policy" already has rule "Custom Standard Preset Security Policy" associated with it. 
+15-02-2024 11:14:22 I - The GraceHasCom12  account does not exist or not user/shared mailbox....... Proceeting to create a new shared mailbox for test purposes
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiSpam.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiMalware.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiPhish.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeAttachment.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeLinks1.ps1
+15-02-2024 11:14:28 E - Error: Exception calling "ReadAllText" with "1" argument(s): "Could not find file 'C:\Users\PNDT\Documents\GitHub\o365SecuritPresetPolicyClonner\DefaultValues\std_safeLinks1.ps1'." 
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiSpam.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiMalware.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiPhish.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeAttachment.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeLinks.ps1
+15-02-2024 11:14:28 S - Loaded successfully
+15-02-2024 11:14:28 I - Clonning Anti-Phish  Custom Standard Preset Security Policy and rule
+15-02-2024 11:14:29 E - Error: |Microsoft.Exchange.Configuration.Tasks.ManagementObjectAlreadyExistsException|Anti phish policy 'Custom Standard Preset Security Policy' already exists. 
+15-02-2024 11:16:01 I - The GraceHasCom12  account does not exist or not user/shared mailbox....... Proceeting to create a new shared mailbox for test purposes
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiSpam.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiMalware.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\std_antiPhish.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeAttachment.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\std_safeLinks1.ps1
+15-02-2024 11:16:07 E - Error: Exception calling "ReadAllText" with "1" argument(s): "Could not find file 'C:\Users\PNDT\Documents\GitHub\o365SecuritPresetPolicyClonner\DefaultValues\std_safeLinks1.ps1'." 
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiSpam.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiMalware.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\str_antiPhish.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeAttachment.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Loading  and processing predefiend data sete .\DefaultValues\str_safeLinks.ps1
+15-02-2024 11:16:07 S - Loaded successfully
+15-02-2024 11:16:07 I - Clonning Anti-Phish  Custom Standard Preset Security Policy and rule
+15-02-2024 11:16:09 I - Clonning Anti-Phish  Custom Strict Preset Security Policy and rule

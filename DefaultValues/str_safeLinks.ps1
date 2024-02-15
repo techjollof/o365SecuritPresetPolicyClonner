@@ -10,4 +10,4 @@ DisableUrlRewrite             = False
 DoNotRewriteUrls              = {}
 LocalizedNotificationTextList = {}
 EnableOrganizationBranding    = False
-Name                          = Custom Preset Security Policy
+Name                          = Custom Strict Preset Security Policy

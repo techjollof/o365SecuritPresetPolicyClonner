@@ -7,9 +7,9 @@ $title = @'
 
     
 #######################################################################################################################################
-            
-                        Preset security policies in EOP and Microsoft Defender for Office 365
-
+#                                                                                                                                     #
+#                        Preset security policies in EOP and Microsoft Defender for Office 365                                        #
+#                                                                                                                                     #
 #######################################################################################################################################
 
     This script attempts to create a copy of the Microsoft 365 Defender preset policies
@@ -51,35 +51,28 @@ $title = @'
                 can refer to the link to know about the applicable situation:
                     https://learn.microsoft.com/en-us/powershell/module/exchange/new-malwarefilterpolicy?view=exchange-ps
                 
-
-######################################################################################################################################
 '@
 
 $warrantStament =@"
 
-######################################################################################################################################
-
-                                            --------------- WARRANTY ------------------ 
+###############################################                   WARRANTY               ############################################
 
     THE SCRIPT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS 
     BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT 
     OF OR IN CONNECTION WITH THE SCRIPT OR THE USE OR OTHER DEALINGS IN THE SCRIPT.
 
-######################################################################################################################################
 
 "@
 
 $CallableFunctions = @"
 
-######################################################################################################################################
+############################                List of functions thatc can be use               ##########################################
 
-List of functions thatc can be use:
+    New-PresetPolicy          | This one can be used to create new policy such as Anti-Spam, Anti-Phish, Malware, SafeAttachment, SafeLink
+    Get-PresetPolicyConfig    | Get and inspect the policy configuration dataset, which can or will be use to create policy
+    New-SecurityPresetPolicy  | Main function for policy and correspointing rule creation
 
-    New-PresetPolicy                | This one can be used to create new policy such as Anti-Spam, Anti-Phish, Malware, SafeAttachment, SafeLink
-    Get-StandardPredefinedPolicy    | Inspect the predefind dataset for the standard present policy
-    Get-StrictPredefinedPolicy      | Inspect the predefind dataset for the standard present policy
-    New-SecurityPresetPolicy        | Main function for policy and correspointing rule creation
 
     Use get-help <Command-Name> to know more about the command and paramters accepted by the command
 
@@ -87,24 +80,16 @@ List of functions thatc can be use:
 
 
 
+# define Error handling
+# note: do not change these values
+$global:ErrorActionPreference = "Stop"
+if($verbose){ $global:VerbosePreference = "Continue" }
 
-# Text header formatting function
-function DisplayHeader([string]$text){
-    $textPadding = [int]($textLenght - $text.Length)/2
-    Write-Host "`n"
-    Write-Host $("#" * $textLenght) "`n"
-    Write-Host $(" " * $textPadding ) $text "`n"
-    Write-Host $("#" * $textLenght) "`n"
-}
+
+#Importing common functions
+. .\CommonAndSharedProgarmFunctions.ps1
 
 #Write function formatter
-function DisplayHelp([string]$text, [string]$color) {
-    if ($color) {
-        Write-Host $text -ForegroundColor $color
-    }else {
-        Write-Host "`n"$text "`n"
-    }
-}
 
 
 
@@ -113,18 +98,22 @@ DisplayHelp -text $warrantStament #-color Yellow
 
 $UsageAgreement = $(Write-Host "Do you AGREE to the terms and conditons [Yes(Y)/No(N)? : " -noNewline;Read-Host)
 
+Write-ActivityLog -InformationType I -Text "User was presented with license agreement conditons [Yes(Y)/No(N)" -LogFile $LogFile
 
 if($UsageAgreement -in "Yes,Y".ToLower().Split(",")){
 
+    Write-ActivityLog -InformationType I -Text "The license agreement conditons was accepted, preceeding to import the needed functionss" -LogFile $LogFile
     DisplayHelp -text $CallableFunctions
-    #. .\SecurityPresetPolicyClonnerFunctions.ps1
-    Import-module .\SecurityPresetPolicyClonnerFunctions.ps1
+    Import-module ".\SecurityPresetPolicyClonnerFunctions.psm1"
+
+    Write-ActivityLog -InformationType S -Text "Function import successful" -LogFile $LogFile
 
 }else {
-    $UsageAgreement = ""
+    
     Remove-Module  SecurityPresetPolicyClonnerFunctions -ErrorAction SilentlyContinue
     Remove-Module  SecurityPresetPolicyClonnerProgram -ErrorAction SilentlyContinue 
+    Write-ActivityLog -InformationType I -Text "The program has ended because usage terms were declined and no command was inported!!!" -LogFile $LogFile
+    Write-ActivityLog -InformationTyp S -Text "Success" -LogFile $LogFile
     DisplayHelp "`nThe program has ended because usage terms were declined and no command was inported!!!`n" -color Red
-    #DisplayHelp -text "Run the following command to try again `"Remove-module SecurityPresetPolicyClonner -ErrorAction SilentlyContinue`" `n" -color Yellow
 }
 

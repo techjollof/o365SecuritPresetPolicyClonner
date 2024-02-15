@@ -49,36 +49,3 @@ function Get-DefaultPresetPolicy {
     return $pp_ati_spm, $pp_ati_mw, $pp_ati_ph,$pp_ati_sat,$pp_ati_slk
 
 }
-
-function New-AntiSpamSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
-
-    Write-Verbose -Message "Clonning Anti-Spam  $($PolicyCreationData.Name) and rule" -verbose
-    New-HostedConnectionFilterPolicy @PolicyCreationData
-}
-
-function New-MalwareSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Malwar Filter  $($PolicyCreationData.Name) and rule" -verbose
-    New-MalwareFilterPolicy @PolicyCreationData
-}
-
-function New-AntiPhishSecurityPresetPolicy ([hashtable]$PolicyCreationData) {
-    
-    Write-Verbose -Message "Clonning Anti-Phish  $($PolicyCreationData.Name) and rule" -verbose
-    New-AntiPhishPolicy @PolicyCreationData
-    
-}
-
-function New-SafeAttachmentSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Safe Attachment  $($PolicyCreationData.Name) and rule" -verbose
-    New-SafeAttachmentPolicy @PolicyCreationData
-
-}
-
-function New-SafeLinkSecurityPresetPolicy ([hashtable]$PolicyCreationData){
-
-    Write-Verbose -Message "Clonning Safe Link  $($PolicyCreationData.Name) and rule" -verbose
-    New-SafeLinksPolicy @PolicyCreationData
-
-}
