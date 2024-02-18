@@ -1,28 +1,17 @@
+﻿$obj = 1..10
 
-[CmdletBinding(SupportsShouldProcess)]
-param(
-    # Policy type selection
-    [Parameter(ParameterSetName = "Standadrd")]
-    $StandardPresetPolicy,
+$obj | ForEach-Object {
+    Write-Host "The new number is $($_ *10)"
+    Start-Sleep 1
+}
 
-    # Policy type selection
-    [Parameter(ParameterSetName = "Standadrd")]
-    [ValidateSet("StandardPolicy","StandardPredefinedPolicy","AllStandardPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy")]
-    $StandardPresetPolicyType,
+$obj | ForEach-Object {
+    Write-Information "The new number is $($_ *10)" -InformationAction Continue
+    Start-Sleep 1
+}
 
-    # Policy type selection
-    [Parameter(ParameterSetName = "Strict")]
-    $StrictPresetPolicy,
 
-    # Policy type selection
-    [Parameter(ParameterSetName = "Strict")]
-    [ValidateSet("StrictPolicy","SrictPredefinedPolicy","AllStrictPolicy","StrictAntiSpamPolicy","StrictAntiPhishPolicy","StrictMalwarePolicy")]
-    $StrictPresetPolicyType
-)
-
-#     if($PresetPolicyType -eq "Standard"){
-#         "StandardPolicy","StandardPredefinedPolicy","AllStandardPolicy","AllStandardPredefinedPolicy","StandardAntiSpamPolicy","StandardAntiPhishPolicy","StandardMalwarePolicy"
-#     }else{
-#         
-#     }
-# },
+$obj | ForEach-Object {
+    Write-Host "The new number is $($_ *10)" -
+    Start-Sleep 1
+}

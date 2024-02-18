@@ -1,4 +1,4 @@
-
+﻿
 Remove-module SecurityPresetPolicyClonner -ErrorAction SilentlyContinue
 
 #text for lenght
@@ -67,7 +67,7 @@ $warrantStament =@"
 
 $CallableFunctions = @"
 
-############################                List of functions thatc can be use               ##########################################
+##################################                List of functions thatc can be use               ##########################################
 
     New-PresetPolicy          | This one can be used to create new policy such as Anti-Spam, Anti-Phish, Malware, SafeAttachment, SafeLink
     Get-PresetPolicyConfig    | Get and inspect the policy configuration dataset, which can or will be use to create policy
@@ -87,7 +87,7 @@ if($verbose){ $global:VerbosePreference = "Continue" }
 
 
 #Importing common functions
-. .\CommonAndSharedProgarmFunctions.ps1
+. $PSScriptRoot\CommonFunctions.ps1
 
 #Write function formatter
 
@@ -114,6 +114,6 @@ if($UsageAgreement -in "Yes,Y".ToLower().Split(",")){
     Remove-Module  SecurityPresetPolicyClonnerProgram -ErrorAction SilentlyContinue 
     Write-ActivityLog -InformationType I -Text "The program has ended because usage terms were declined and no command was inported!!!" -LogFile $LogFile
     Write-ActivityLog -InformationTyp S -Text "Success" -LogFile $LogFile
-    DisplayHelp "`nThe program has ended because usage terms were declined and no command was inported!!!`n" -color Red
+    
 }
 

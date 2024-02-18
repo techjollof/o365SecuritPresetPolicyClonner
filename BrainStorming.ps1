@@ -1,4 +1,4 @@
-# Getting the current default Strict and standard policy
+﻿# Getting the current default Strict and standard policy
 # The policy retrival will depend on the select option by user
 # if user selects Predefined or defult, you must use either strict or standard,StrictPredefined and StandardPredefined
 
@@ -16,8 +16,8 @@ function Get-DefaultPresetPolicy {
     )
 
     # locad the predefind data set, this will be used to replace any policy that returns null
-    $PredefinedPresetPolicySettings = if($PresetPolicyType -eq "Standard"){Get-StandardPredefinedPolicy}else{Get-StrictPredefinedPolicy} 
-    
+    $PredefinedPresetPolicySettings = if($PresetPolicyType -eq "Standard"){Get-StandardPredefinedPolicy}else{Get-StrictPredefinedPolicy}
+
     #getting the tenant value settings
     $pp_ati_spm = Get-HostedContentFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType
     $pp_ati_mw = Get-MalwareFilterPolicy | Where-Object -Property RecommendedPolicyType -eq -Value $PresetPolicyType

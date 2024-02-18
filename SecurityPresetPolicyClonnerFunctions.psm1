@@ -1,5 +1,5 @@
-#Importing common functions
-. .\CommonAndSharedProgarmFunctions.ps1
+﻿#Importing common functions
+. $PSScriptRoot\CommonFunctions.ps1
 
 # Set default log directory (in case the variable $LogFile has not been defined)
 #$LogFile = ""
@@ -14,15 +14,15 @@ if ( ([string]::IsNullOrEmpty($LogFile)) -Or ($LogFile.Length -eq 0) ) {
 # the return results will be used for splatting
 function Convert-ArrayToHashtable ([array]$ArrayStringData) {
     try {
-        
-        Write-ActivityLog -InformationType I "Loading  and processing predefiend data sete $($ArrayStringData)" -LogFile $LogFile
+
+        Write-ActivityLog -InformationType I "Loading  and processing predefiend data set $($ArrayStringData)" -LogFile $LogFile
         $Rawdata = ConvertFrom-StringData ([io.file]::ReadAllText($ArrayStringData) -join "`n")
         @($Rawdata.GetEnumerator()) | Where-Object {$_.Value  -in "true","false","@()","@{}","{}",'()' } | ForEach-Object {
-            $Rawdata[$_.Key] = if ($_.Value -eq "true"){     
+            $Rawdata[$_.Key] = if ($_.Value -eq "true"){
                 $true
             }elseif ($_.Value -eq "false") {
                 $false
-            }else{ 
+            }else{
                 @{}
             }
         }
@@ -54,7 +54,7 @@ function Get-PresetPolicyConfig {
         This defines the data source selection. The valid values are PredefindPresetPolicyConfig and CurrentTenantPresetPolicyConfig. The default value is PredefindPresetPolicyConfig
 
     .EXAMPLE
-        PS> 
+        PS>
         Get-PresetPolicyConfig -PresetPolicyType Standard -PresetPolicyDataSource PredefindPresetPolicyConfig
 
         This will get the predefined standard present policy configuration from the configuration file and return data.
@@ -75,7 +75,7 @@ function Get-PresetPolicyConfig {
 
     try {
         switch ($PresetPolicyDataSource) {
-            "PredefindPresetPolicyConfig" { 
+            "PredefindPresetPolicyConfig" {
                 switch ($PresetPolicyType){
                     "Standard" {
                         $pp_ati_spm = Convert-ArrayToHashtable -ArrayStringData .\DefaultValues\std_antiSpam.ps1
@@ -110,7 +110,7 @@ function Get-PresetPolicyConfig {
     catch {
         $Message = $_
         Write-ActivityLog -InformationType E -Text "Error: $($Message[0]) " -LogFile $LogFile
-        
+
     }
 }
 
@@ -131,10 +131,10 @@ if("ExchangeOnlineManagement" -notin (Get-InstalledModule).Name){
 }else {
 
     $exoSessions = Get-ConnectionInformation
-    
+
     if (($null -eq $exoSessions) -or ("Active" -notin $exoSessions.TokenStatus)) {
         Write-ActivityLog -InformationType I -Text "Conneting...... Sign-in with global or exchange admin account " -LogFile $LogFile
-        Connect-ExchangeOnline -ShowBanner:$false 
+        Connect-ExchangeOnline -ShowBanner:$false
         Write-ActivityLog -InformationType S -Text ".........Exchange online connected successfully" -LogFile $LogFile
     }else {
         Write-ActivityLog -InformationType I -Text "Exchange online connected is already connected`n" -LogFile $LogFile
@@ -146,13 +146,13 @@ if("ExchangeOnlineManagement" -notin (Get-InstalledModule).Name){
 
 #Anti spam, malware, phish, safe attachment, safe link funtion
 function New-PresetPolicy{
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter(HelpMessage="This defines the data set for antispam policy to be created")]
-        [hashtable]$AntiSpam, 
+        [hashtable]$AntiSpam,
         [hashtable]$AntiMalware,
-        [hashtable]$AntiPhish, 
-        [hashtable]$SafeAttachment, 
+        [hashtable]$AntiPhish,
+        [hashtable]$SafeAttachment,
         [hashtable]$SafeLink,
         [Parameter(Mandatory,HelpMessage="Specifies a test mailbox or shared that will be used to create policy rule")]
         [string]$TestSharedOrUserMailbox
@@ -174,11 +174,11 @@ function New-PresetPolicy{
         if ($null -ne $policyInfo) {
             $PolicyNames.Add("AntiMalware", $policyInfo.Name)
             New-MalwareFilterRule -Name $policyInfo.Name -MalwareFilterPolicy $policyInfo.Name -SentTo $TestSharedOrUserMailbox | Out-Null
-        } 
+        }
     }
     if ($AntiPhish) {
         Write-ActivityLog -InformationType I -Text "Clonning Anti-Phish  $($AntiPhish.Name) and rule" -logfile $logfile
-        $policyInfo = New-AntiPhishPolicy @AntiPhish 
+        $policyInfo = New-AntiPhishPolicy @AntiPhish
         if ($null -ne $policyInfo) {
             New-AntiPhishRule -Name $policyInfo.Name -AntiPhishPolicy $policyInfo.Name  -SentTo $TestSharedOrUserMailbox | Out-Null
             $PolicyNames.Add("AntiPhish", $policyInfo.Name)
@@ -211,7 +211,7 @@ function New-SecurityPresetPolicy {
     .SYNOPSIS
         This script attempts to create a copy of the Microsoft 365 Defender preset policies.
     .DESCRIPTION
-        Depending on your organization, preset security policies provide many of the protection features that are available 
+        Depending on your organization, preset security policies provide many of the protection features that are available
         in Exchange Online Protection (EOP) and Microsoft Defender for Office 365.
         The script give generate copy of all policies that are releate to Standard and Strict present policies
 
@@ -231,23 +231,23 @@ function New-SecurityPresetPolicy {
         A new shared mailbox be automaticall created and used for the policy rule creation.
 
     .EXAMPLE
-        PS> 
+        PS>
         New-SecurityPresetPolicy -PresetPolicyType Standard -SecurityPresetPolicy AntiSpamPolicy -TestSharedOrUserMailbox demo@user.com
 
         This will create a Anti-spam standard present policy and apply to the demo account.
 
     .EXAMPLE
-        PS> 
+        PS>
         New-SecurityPresetPolicy -PresetPolicyType Standard -SecurityPresetPolicy AntiSpamPolicy -PresetPolicyDataSource PredefindPresetPolicyConfig -TestSharedOrUserMailbox demo@user.com
 
         This will create a Anti-spam standard present policy and apply to the demo account. This is the same as example 1 because PresetPolicyDataSource has PredefindPresetPolicyConfig as default.
 
     .EXAMPLE
-        PS> 
+        PS>
         New-SecurityPresetPolicy -PresetPolicyType Standard -SecurityPresetPolicy AllPresetPolicy -TestSharedOrUserMailbox demo@user.com
 
         This will create a Anti-spam, Anti-Phish, Malware, SafeAttachment and SafeLink standard present policy and apply to the demo account.
-    
+
     #>
 
     [CmdletBinding(SupportsShouldProcess)]
@@ -276,14 +276,14 @@ function New-SecurityPresetPolicy {
     )
 
     try {
-            
+
         #validate TestSharedOrUserMailbox
         try {
 
             $ValidateUser = Get-Recipient $TestSharedOrUserMailbox -ErrorAction SilentlyContinue
             if (($ValidateUser.RecipientTypeDetails -notin "SharedMailbox","UserMailbbox") -or ($null -eq $ValidateUser)) {
                 Write-ActivityLog -InformationType I -Text "The $($TestSharedOrUserMailbox)  account does not exist or not user/shared mailbox....... Proceeting to create a new shared mailbox for test purposes" -LogFile $LogFile
-                $TestSharedOrUserMailbox = (New-Mailbox  $("TestSharedOrUserMailbox"+(Get-Date).TimeOfDay.Ticks) -Shared).PrimarySMTPAddress
+                $TestSharedOrUserMailbox = (New-Mailbox  $($TestSharedOrUserMailbox)+"-"+$(Get-Date).TimeOfDay.Ticks -Shared).PrimarySMTPAddress
             }else {
                 Write-ActivityLog -InformationType I -Text "The $($TestSharedOrUserMailbox) account provided is valid" -LogFile $LogFile
             }
@@ -301,31 +301,31 @@ function New-SecurityPresetPolicy {
             }else{
                 Get-PresetPolicyConfig -PresetPolicyType $PresetPolicyType -PresetPolicyDataSource $PresetPolicyDataSource
             }
-            
+
             switch ($SecurityPresetPolicy) {
-                "AllPresetPolicy" { 
+                "AllPresetPolicy" {
                     New-PresetPolicy -AntiSpam $pp_ati_spm -AntiMalware $pp_ati_mw -AntiPhish $pp_ati_ph -SafeAttachment $pp_ati_sat -SafeLink $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
-                "AntiSpamPolicy" { 
-                    New-PresetPolicy -AntiSpam $pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox 
-                    break 
+                "AntiSpamPolicy" {
+                    New-PresetPolicy -AntiSpam $pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "MalwarePolicy" { 
-                    New-PresetPolicy -AntiMalware $pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox           
-                    break 
+                "MalwarePolicy" {
+                    New-PresetPolicy -AntiMalware $pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "AntiPhishPolicy" { 
-                    New-PresetPolicy -AntiPhish $pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox              
-                    break 
+                "AntiPhishPolicy" {
+                    New-PresetPolicy -AntiPhish $pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "SafeAttachmentPolicy" { 
+                "SafeAttachmentPolicy" {
                     New-PresetPolicy -SafeAttachment $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
-                "SafeLinkPolicy" { 
+                "SafeLinkPolicy" {
                     New-PresetPolicy -SafeLink $pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
             }
         }else {
@@ -334,35 +334,35 @@ function New-SecurityPresetPolicy {
             $str_pp_ati_spm, $str_pp_ati_mw, $str_pp_ati_ph, $str_pp_ati_sat, $str_pp_ati_slk = Get-PresetPolicyConfig -PresetPolicyType Strict -PresetPolicyDataSource $PresetPolicyDataSource
 
             switch ($SecurityPresetPolicy) {
-                "AllPresetPolicy" { 
+                "AllPresetPolicy" {
                     New-PresetPolicy -AntiSpam $std_pp_ati_spm -AntiMalware $std_pp_ati_mw -AntiPhish $std_pp_ati_ph -SafeAttachment $std_pp_ati_sat -SafeLink $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                     New-PresetPolicy -AntiSpam $str_pp_ati_spm -AntiMalware $str_pp_ati_mw -AntiPhish $str_pp_ati_ph -SafeAttachment $str_pp_ati_sat -SafeLink $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
-                "AntiSpamPolicy" { 
+                "AntiSpamPolicy" {
                     New-PresetPolicy -AntiSpam $std_pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    New-PresetPolicy -AntiSpam $str_pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox          
-                    break 
+                    New-PresetPolicy -AntiSpam $str_pp_ati_spm -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "MalwarePolicy" { 
+                "MalwarePolicy" {
                     New-PresetPolicy -AntiMalware $std_pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    New-PresetPolicy -AntiMalware $str_pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox               
-                    break 
+                    New-PresetPolicy -AntiMalware $str_pp_ati_mw -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "AntiPhishPolicy" { 
+                "AntiPhishPolicy" {
                     New-PresetPolicy -AntiPhish $std_pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    New-PresetPolicy -AntiPhish $str_pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox             
-                    break 
+                    New-PresetPolicy -AntiPhish $str_pp_ati_ph -TestSharedOrUserMailbox $TestSharedOrUserMailbox
+                    break
                 }
-                "SafeAttachmentPolicy" { 
+                "SafeAttachmentPolicy" {
                     New-PresetPolicy -SafeAttachment $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                     New-PresetPolicy -SafeAttachment $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
-                "SafeLinkPolicy" { 
+                "SafeLinkPolicy" {
                     New-PresetPolicy -SafeLink $std_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
                     New-PresetPolicy -SafeLink $str_pp_ati_slk -TestSharedOrUserMailbox $TestSharedOrUserMailbox
-                    break 
+                    break
                 }
             }
 
@@ -371,9 +371,9 @@ function New-SecurityPresetPolicy {
     catch {
         $Message = $_
         Write-ActivityLog -InformationType E -Text "Error: $($Message[0]) " -LogFile $LogFile
-        
+
     }
 
-    
+
 }
 
